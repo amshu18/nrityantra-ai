@@ -77,16 +77,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Natya AI — Bharatanatyam Performance Analysis" },
+      {
+        name: "description",
+        content: "AI-powered Bharatanatyam training with full-body pose tracking, mudra recognition and unbiased scoring.",
+      },
+      { name: "author", content: "Natya AI" },
+      { property: "og:title", content: "Natya AI — Bharatanatyam Performance Analysis" },
+      {
+        property: "og:description",
+        content: "Real-time analysis of mudras, adavus, padabhedas, posture and footwork with scored reports.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Karla:wght@400;500;600&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
