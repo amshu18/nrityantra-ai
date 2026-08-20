@@ -80,4 +80,4 @@ export const ADAVUS: Adavu[] = [
   },
 ];
 
-export const getAdavu = (id: string) => ADAVUS.find((a) => a.id === id) ?? ADAVUS[0];
+export const getAdavu = (id: string) => ADAVUS.find((a) => a.id === id) ?? ADAVUS[0]!;

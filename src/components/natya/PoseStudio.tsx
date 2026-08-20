@@ -36,7 +36,7 @@ export function PoseStudio() {
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [adavuId, setAdavuId] = useState(ADAVUS[0].id);
+  const [adavuId, setAdavuId] = useState(ADAVUS[0]!.id);
   const adavuRef = useRef(getAdavu(adavuId));
   const [analysis, setAnalysis] = useState<FrameAnalysis | null>(null);
   const [feed, setFeed] = useState<Mistake[]>([]);
@@ -69,8 +69,8 @@ export function PoseStudio() {
       ctx.lineWidth = 3;
       for (const [a, b] of CONNECTIONS) {
         ctx.beginPath();
-        ctx.moveTo(lm[a].x * canvas.width, lm[a].y * canvas.height);
-        ctx.lineTo(lm[b].x * canvas.width, lm[b].y * canvas.height);
+        ctx.moveTo(lm[a]!.x * canvas.width, lm[a]!.y * canvas.height);
+        ctx.lineTo(lm[b]!.x * canvas.width, lm[b]!.y * canvas.height);
         ctx.stroke();
       }
       ctx.fillStyle = "rgba(255, 236, 200, 0.95)";
@@ -109,7 +109,7 @@ export function PoseStudio() {
     if (lm) {
       const t = now - startRef.current;
       const cfg = adavuRef.current;
-      footRef.current.push(Math.min(lm[L.lAnkle].y, lm[L.rAnkle].y), now, cfg.tempo);
+      footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
       const handed: string[] = (hands?.handedness ?? []).map((h: any) => h[0]?.categoryName ?? "");
       const mudras = { left: "—", right: "—" };
       (hands?.landmarks ?? []).forEach((h: any, i: number) => {
@@ -233,7 +233,7 @@ export function PoseStudio() {
     };
     const averages = (Object.keys(scoresRef.current) as MetricKey[]).map((key) => {
       const arr = scoresRef.current[key];
-      return { key, label: labels[key], score: Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) };
+      return { key, label: labels[key]!, score: Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) };
     });
     if (averages.length) {
       const overall = Math.round(averages.reduce((a, m) => a + m.score, 0) / averages.length);
@@ -253,7 +253,7 @@ export function PoseStudio() {
         averages,
         deductions: [...byMetric.entries()].map(([metric, v]) => ({
           metric,
-          label: labels[metric],
+          label: labels[metric]!,
           count: v.count,
           points: v.points,
         })).sort((a, b) => b.points - a.points),

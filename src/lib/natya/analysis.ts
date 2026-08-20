@@ -101,20 +101,20 @@ export function analyzeFrame(
   mudras: { left: string; right: string },
   foot: { tempo: number | null; steadiness: number | null },
 ): FrameAnalysis {
-  const shoulderW = Math.hypot(p[L.lShoulder].x - p[L.rShoulder].x, p[L.lShoulder].y - p[L.rShoulder].y) || 0.2;
-  const shoulders = mid(p[L.lShoulder], p[L.rShoulder]);
-  const hips = mid(p[L.lHip], p[L.rHip]);
+  const shoulderW = Math.hypot(p[L.lShoulder]!.x - p[L.rShoulder]!.x, p[L.lShoulder]!.y - p[L.rShoulder]!.y) || 0.2;
+  const shoulders = mid(p[L.lShoulder]!, p[L.rShoulder]!);
+  const hips = mid(p[L.lHip]!, p[L.rHip]!);
 
   // --- Araimandi: half-sitting knee flexion
-  const kneeL = angle(p[L.lHip], p[L.lKnee], p[L.lAnkle]);
-  const kneeR = angle(p[L.rHip], p[L.rKnee], p[L.rAnkle]);
+  const kneeL = angle(p[L.lHip]!, p[L.lKnee]!, p[L.lAnkle]!);
+  const kneeR = angle(p[L.rHip]!, p[L.rKnee]!, p[L.rAnkle]!);
   const knee = (kneeL + kneeR) / 2;
   const araimandi = tolerance(knee, adavu.kneeAngle, 8, 55);
 
   // --- Posture: torso verticality + shoulder level + head over hips
   const torsoTilt = (Math.atan2(shoulders.x - hips.x, hips.y - shoulders.y) * 180) / Math.PI;
   const shoulderTilt =
-    (Math.atan2(p[L.lShoulder].y - p[L.rShoulder].y, Math.abs(p[L.lShoulder].x - p[L.rShoulder].x) || 1e-6) * 180) /
+    (Math.atan2(p[L.lShoulder]!.y - p[L.rShoulder]!.y, Math.abs(p[L.lShoulder]!.x - p[L.rShoulder]!.x) || 1e-6) * 180) /
     Math.PI;
   const posture = Math.round(
     0.6 * tolerance(Math.abs(torsoTilt), 0, 4, 28) + 0.4 * tolerance(Math.abs(shoulderTilt), 0, 4, 25),
@@ -124,14 +124,14 @@ export function analyzeFrame(
   const kneeDiff = Math.abs(kneeL - kneeR);
   const wristDiff =
     Math.abs(
-      (shoulders.y - p[L.lWrist].y) / shoulderW - (shoulders.y - p[L.rWrist].y) / shoulderW,
+      (shoulders.y - p[L.lWrist]!.y) / shoulderW - (shoulders.y - p[L.rWrist]!.y) / shoulderW,
     ) * 100;
   const symmetry = Math.round(0.5 * tolerance(kneeDiff, 0, 6, 45) + 0.5 * tolerance(wristDiff, 0, 8, 70));
 
   // --- Hasta placement: arm elevation vs shoulder line
   const armEl = (side: "l" | "r") => {
-    const sh = side === "l" ? p[L.lShoulder] : p[L.rShoulder];
-    const wr = side === "l" ? p[L.lWrist] : p[L.rWrist];
+    const sh = side === "l" ? p[L.lShoulder]! : p[L.rShoulder]!;
+    const wr = side === "l" ? p[L.lWrist]! : p[L.rWrist]!;
     return (Math.atan2(sh.y - wr.y, Math.abs(wr.x - sh.x) || 1e-6) * 180) / Math.PI;
   };
   const elevation = (armEl("l") + armEl("r")) / 2;
@@ -140,10 +140,10 @@ export function analyzeFrame(
   const hasta = Math.round(armScore * (mudraKnown === 2 ? 1 : mudraKnown === 1 ? 0.92 : 0.8));
 
   // --- Padabheda: stance width & foot turnout
-  const stance = Math.hypot(p[L.lAnkle].x - p[L.rAnkle].x, p[L.lAnkle].y - p[L.rAnkle].y) / shoulderW;
+  const stance = Math.hypot(p[L.lAnkle]!.x - p[L.rAnkle]!.x, p[L.lAnkle]!.y - p[L.rAnkle]!.y) / shoulderW;
   const turnout =
-    (Math.abs((Math.atan2(p[L.lToe].y - p[L.lHeel].y, p[L.lToe].x - p[L.lHeel].x) * 180) / Math.PI) +
-      Math.abs((Math.atan2(p[L.rToe].y - p[L.rHeel].y, p[L.rToe].x - p[L.rHeel].x) * 180) / Math.PI)) /
+    (Math.abs((Math.atan2(p[L.lToe]!.y - p[L.lHeel]!.y, p[L.lToe]!.x - p[L.lHeel]!.x) * 180) / Math.PI) +
+      Math.abs((Math.atan2(p[L.rToe]!.y - p[L.rHeel]!.y, p[L.rToe]!.x - p[L.rHeel]!.x) * 180) / Math.PI)) /
     2;
   const padabheda = Math.round(
     0.65 * tolerance(stance, adavu.stance, 0.25, 1.6) + 0.35 * tolerance(turnout, 25, 12, 70),
