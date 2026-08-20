@@ -10,7 +10,7 @@ export function classifyMudra(lm: Pt[] | null | undefined): string {
   if (!lm || lm.length < 21) return "—";
   const wrist = lm[0]!;
   const palm = dist(wrist, lm[9]!) || 1;
-  const extended = TIPS.map((tip, i) => dist(wrist, lm[tip]) > dist(wrist, lm[PIPS[i]]) * 1.05);
+  const extended = TIPS.map((tip, i) => dist(wrist, lm[tip]!) > dist(wrist, lm[PIPS[i]!]!) * 1.05);
   const [thumb, index, middle, ring, pinky] = extended;
   const spread = dist(lm[8]!, lm[20]!) / palm;
   const thumbIndex = dist(lm[4]!, lm[8]!) / palm;

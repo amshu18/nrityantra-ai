@@ -126,7 +126,7 @@ export function PoseStudio() {
       for (const m of res.metrics) {
         (scoresRef.current[m.key] ||= []).push(m.score);
       }
-      if (timelineRef.current.length === 0 || t - timelineRef.current[timelineRef.current.length - 1].t > 500)
+      if (timelineRef.current.length === 0 || t - timelineRef.current[timelineRef.current.length - 1]!.t > 500)
         timelineRef.current.push({ t: Math.round(t), score: res.overall });
 
       for (const issue of res.issues) {

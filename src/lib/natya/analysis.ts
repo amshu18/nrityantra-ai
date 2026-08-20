@@ -75,7 +75,7 @@ export class FootworkTracker {
   tempo(): number | null {
     if (this.strikes.length < 3) return null;
     const gaps: number[] = [];
-    for (let i = 1; i < this.strikes.length; i++) gaps.push(this.strikes[i] - this.strikes[i - 1]);
+    for (let i = 1; i < this.strikes.length; i++) gaps.push(this.strikes[i]! - this.strikes[i - 1]!);
     const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
     return avg > 0 ? Math.round(60000 / avg) : null;
   }
@@ -84,7 +84,7 @@ export class FootworkTracker {
   steadiness(): number | null {
     if (this.strikes.length < 4) return null;
     const gaps: number[] = [];
-    for (let i = 1; i < this.strikes.length; i++) gaps.push(this.strikes[i] - this.strikes[i - 1]);
+    for (let i = 1; i < this.strikes.length; i++) gaps.push(this.strikes[i]! - this.strikes[i - 1]!);
     const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
     const dev = Math.sqrt(gaps.reduce((a, b) => a + (b - avg) ** 2, 0) / gaps.length);
     return Math.max(0, Math.round(100 - (dev / Math.max(avg, 1)) * 220));
