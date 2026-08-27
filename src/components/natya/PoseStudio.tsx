@@ -201,7 +201,7 @@ export function PoseStudio() {
       setElapsed(t);
     }
     rafRef.current = requestAnimationFrame(loop);
-  }, [draw]);
+  }, [draw, drawReference]);
 
   const start = useCallback(async () => {
     setError(null);
