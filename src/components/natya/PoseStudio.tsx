@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ADAVUS, getAdavu } from "@/lib/natya/adavus";
 import { analyzeFrame, FootworkTracker, gradeFor, L, SUGGESTION_BANK } from "@/lib/natya/analysis";
 import { classifyMudra, MUDRA_NOTES } from "@/lib/natya/mudra";
-import { comparePose, referencePose, type Deviation } from "@/lib/natya/reference";
+
 import { saveSession } from "@/lib/natya/session";
 import type { FrameAnalysis, Metric, MetricKey, Mistake, Pt, SessionReport } from "@/lib/natya/types";
-import { ComparisonPanel } from "./ComparisonPanel";
+
 import { MetricBar, ScoreRing } from "./ScoreRing";
 import { SessionReportView } from "./SessionReportView";
 
@@ -36,8 +36,6 @@ export function PoseStudio() {
   const lastIssueRef = useRef<Record<string, number>>({});
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const refCanvasRef = useRef<HTMLCanvasElement>(null);
-  const highlightRef = useRef<Set<number>>(new Set());
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +46,6 @@ export function PoseStudio() {
   const [report, setReport] = useState<SessionReport | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
-  const [deviations, setDeviations] = useState<Deviation[]>([]);
 
 
   useEffect(() => {
@@ -72,21 +69,18 @@ export function PoseStudio() {
 
     const lm = pose?.landmarks?.[0];
     if (lm) {
-      const hot = highlightRef.current;
+      ctx.strokeStyle = "rgba(245, 190, 90, 0.9)";
       ctx.lineWidth = 3;
       for (const [a, b] of CONNECTIONS) {
-        const off = hot.has(a) && hot.has(b);
-        ctx.strokeStyle = off ? "rgba(248, 90, 90, 0.95)" : "rgba(245, 190, 90, 0.9)";
-        ctx.lineWidth = off ? 5 : 3;
         ctx.beginPath();
         ctx.moveTo(lm[a]!.x * canvas.width, lm[a]!.y * canvas.height);
         ctx.lineTo(lm[b]!.x * canvas.width, lm[b]!.y * canvas.height);
         ctx.stroke();
       }
-      lm.forEach((p: Pt, i: number) => {
-        ctx.fillStyle = hot.has(i) ? "rgba(248, 90, 90, 0.95)" : "rgba(255, 236, 200, 0.95)";
+      ctx.fillStyle = "rgba(255, 236, 200, 0.95)";
+      lm.forEach((p: Pt) => {
         ctx.beginPath();
-        ctx.arc(p.x * canvas.width, p.y * canvas.height, hot.has(i) ? 6 : 4, 0, Math.PI * 2);
+        ctx.arc(p.x * canvas.width, p.y * canvas.height, 4, 0, Math.PI * 2);
         ctx.fill();
       });
     }
@@ -101,39 +95,6 @@ export function PoseStudio() {
     ctx.restore();
   }, []);
 
-  const drawReference = useCallback((pts: Pt[]) => {
-    const canvas = refCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const w = (canvas.width = canvas.clientWidth || 480);
-    const h = (canvas.height = canvas.clientHeight || 360);
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(18, 10, 14, 1)";
-    ctx.fillRect(0, 0, w, h);
-
-    // keep the figure proportional inside the frame
-    const s = Math.min(w, h) * 1.05;
-    const ox = w / 2 - s / 2;
-    const oy = h / 2 - s / 2;
-    const X = (p: Pt) => ox + p.x * s;
-    const Y = (p: Pt) => oy + p.y * s;
-
-    ctx.strokeStyle = "rgba(120, 220, 170, 0.95)";
-    ctx.lineWidth = 4;
-    for (const [a, b] of CONNECTIONS) {
-      ctx.beginPath();
-      ctx.moveTo(X(pts[a]!), Y(pts[a]!));
-      ctx.lineTo(X(pts[b]!), Y(pts[b]!));
-      ctx.stroke();
-    }
-    ctx.fillStyle = "rgba(220, 255, 235, 0.95)";
-    for (const p of pts) {
-      ctx.beginPath();
-      ctx.arc(X(p), Y(p), 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }, []);
 
 
   const loop = useCallback(() => {
@@ -150,18 +111,10 @@ export function PoseStudio() {
     }
     draw(pose, hands);
 
-    const cfgNow = adavuRef.current;
-    const phase = ((now - startRef.current) / (60000 / cfgNow.tempo)) % 1;
-    const refPts = referencePose(cfgNow, phase);
-    drawReference(refPts);
-
     const lm = pose?.landmarks?.[0];
     if (lm) {
       const t = now - startRef.current;
-      const cfg = cfgNow;
-      const devs = comparePose(lm, refPts);
-      highlightRef.current = new Set(devs.filter((d) => d.severity !== "ok").flatMap((d) => d.joints));
-      setDeviations(devs);
+      const cfg = adavuRef.current;
       footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
 
       const handed: string[] = (hands?.handedness ?? []).map((h: any) => h[0]?.categoryName ?? "");
@@ -201,7 +154,7 @@ export function PoseStudio() {
       setElapsed(t);
     }
     rafRef.current = requestAnimationFrame(loop);
-  }, [draw, drawReference]);
+  }, [draw]);
 
   const start = useCallback(async () => {
     setError(null);
@@ -245,8 +198,6 @@ export function PoseStudio() {
       timelineRef.current = [];
       lastIssueRef.current = {};
       setFeed([]);
-      setDeviations([]);
-      highlightRef.current = new Set();
 
       startRef.current = performance.now();
 
@@ -345,13 +296,9 @@ export function PoseStudio() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
           <div className="panel relative aspect-video overflow-hidden">
             <video ref={videoRef} playsInline muted className="hidden" />
             <canvas ref={canvasRef} className="h-full w-full object-cover" />
-            <span className="absolute bottom-3 left-3 rounded-full bg-background/80 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-primary">
-              You
-            </span>
             {!running && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/70 text-center">
                 {status === "loading" ? (
@@ -375,21 +322,6 @@ export function PoseStudio() {
                 REC {(elapsed / 1000).toFixed(1)}s
               </div>
             )}
-          </div>
-
-          <div className="panel relative aspect-video overflow-hidden">
-            <canvas ref={refCanvasRef} className="h-full w-full" />
-            <span className="absolute bottom-3 left-3 rounded-full bg-background/80 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-emerald-300">
-              Instructor reference
-            </span>
-            {!running && (
-              <div className="absolute inset-0 flex items-center justify-center bg-background/70 px-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  The reference dancer for {adavu.name} animates here at {adavu.tempo} bpm, side by side with you.
-                </p>
-              </div>
-            )}
-          </div>
           </div>
 
 
@@ -451,10 +383,6 @@ export function PoseStudio() {
               <MetricBar key={m.key} label={m.label} score={m.score} detail={m.detail} />
             ))}
           </div>
-
-          <ComparisonPanel rows={deviations} />
-
-
 
           <div className="panel space-y-3 p-5">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Corrections</h3>
