@@ -77,13 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Natya AI — Bharatanatyam Performance Analysis" },
+      { title: "Nrityaantra — AI for Bharatanatyam" },
       {
         name: "description",
         content: "AI-powered Bharatanatyam training with full-body pose tracking, mudra recognition and unbiased scoring.",
       },
-      { name: "author", content: "Natya AI" },
-      { property: "og:title", content: "Natya AI — Bharatanatyam Performance Analysis" },
+      { name: "author", content: "Nrityaantra" },
+      { property: "og:title", content: "Nrityaantra — AI for Bharatanatyam" },
       {
         property: "og:description",
         content: "Real-time analysis of mudras, adavus, padabhedas, posture and footwork with scored reports.",
