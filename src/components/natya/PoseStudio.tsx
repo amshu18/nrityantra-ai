@@ -452,6 +452,10 @@ export function PoseStudio() {
             ))}
           </div>
 
+          <ComparisonPanel rows={deviations} />
+
+
+
           <div className="panel space-y-3 p-5">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">Corrections</h3>
             {feed.length === 0 && <p className="text-sm text-muted-foreground">No corrections yet — keep dancing.</p>}
