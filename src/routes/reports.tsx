@@ -9,13 +9,13 @@ import type { SessionReport } from "@/lib/natya/types";
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "Practice Reports — Natya AI" },
+      { title: "Practice Reports — Nrityaantra" },
       {
         name: "description",
         content:
           "Review scored Bharatanatyam practice sessions: parameter averages, itemised score deductions, time-stamped mistakes and improvement plans.",
       },
-      { property: "og:title", content: "Practice Reports — Natya AI" },
+      { property: "og:title", content: "Practice Reports — Nrityaantra" },
       {
         property: "og:description",
         content: "Scored Bharatanatyam sessions with deductions, mistakes and a personalised practice plan.",

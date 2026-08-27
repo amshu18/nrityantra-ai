@@ -8,13 +8,13 @@ import { ADAVUS } from "@/lib/natya/adavus";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Natya AI — Bharatanatyam Performance Analysis" },
+      { title: "Nrityaantra — AI for Bharatanatyam" },
       {
         name: "description",
         content:
           "AI Bharatanatyam coach: MediaPipe full-body pose tracking that evaluates mudras, adavus, padabhedas, posture, footwork and tala sync with real-time feedback and scored reports.",
       },
-      { property: "og:title", content: "Natya AI — Bharatanatyam Performance Analysis" },
+      { property: "og:title", content: "Nrityaantra — AI for Bharatanatyam" },
       {
         property: "og:description",
         content:
@@ -42,7 +42,7 @@ function Home() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <p className="text-xs uppercase tracking-[0.32em] text-primary">Natya AI</p>
+            <p className="text-xs uppercase tracking-[0.32em] text-primary">Nrityaantra</p>
             <h1 className="mt-4 text-4xl font-semibold leading-[1.08] sm:text-6xl">
               An <span className="text-gradient-gold">unbiased AI guru</span> for Bharatanatyam
             </h1>
@@ -121,7 +121,7 @@ function Home() {
       </section>
 
       <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
-        Natya AI · all video processing happens locally in your browser.
+        Nrityaantra · all video processing happens locally in your browser.
       </footer>
     </main>
   );
