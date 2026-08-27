@@ -245,6 +245,9 @@ export function PoseStudio() {
       timelineRef.current = [];
       lastIssueRef.current = {};
       setFeed([]);
+      setDeviations([]);
+      highlightRef.current = new Set();
+
       startRef.current = performance.now();
 
       try {
