@@ -342,9 +342,13 @@ export function PoseStudio() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
           <div className="panel relative aspect-video overflow-hidden">
             <video ref={videoRef} playsInline muted className="hidden" />
             <canvas ref={canvasRef} className="h-full w-full object-cover" />
+            <span className="absolute bottom-3 left-3 rounded-full bg-background/80 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-primary">
+              You
+            </span>
             {!running && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/70 text-center">
                 {status === "loading" ? (
@@ -369,6 +373,22 @@ export function PoseStudio() {
               </div>
             )}
           </div>
+
+          <div className="panel relative aspect-video overflow-hidden">
+            <canvas ref={refCanvasRef} className="h-full w-full" />
+            <span className="absolute bottom-3 left-3 rounded-full bg-background/80 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-emerald-300">
+              Instructor reference
+            </span>
+            {!running && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/70 px-6 text-center">
+                <p className="text-sm text-muted-foreground">
+                  The reference dancer for {adavu.name} animates here at {adavu.tempo} bpm, side by side with you.
+                </p>
+              </div>
+            )}
+          </div>
+          </div>
+
 
           <div className="flex flex-wrap items-center gap-3">
             <select
