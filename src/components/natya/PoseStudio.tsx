@@ -150,11 +150,20 @@ export function PoseStudio() {
     }
     draw(pose, hands);
 
+    const cfgNow = adavuRef.current;
+    const phase = ((now - startRef.current) / (60000 / cfgNow.tempo)) % 1;
+    const refPts = referencePose(cfgNow, phase);
+    drawReference(refPts);
+
     const lm = pose?.landmarks?.[0];
     if (lm) {
       const t = now - startRef.current;
-      const cfg = adavuRef.current;
+      const cfg = cfgNow;
+      const devs = comparePose(lm, refPts);
+      highlightRef.current = new Set(devs.filter((d) => d.severity !== "ok").flatMap((d) => d.joints));
+      setDeviations(devs);
       footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
+
       const handed: string[] = (hands?.handedness ?? []).map((h: any) => h[0]?.categoryName ?? "");
       const mudras = { left: "—", right: "—" };
       (hands?.landmarks ?? []).forEach((h: any, i: number) => {
