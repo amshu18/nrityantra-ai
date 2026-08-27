@@ -95,39 +95,6 @@ export function PoseStudio() {
     ctx.restore();
   }, []);
 
-  const drawReference = useCallback((pts: Pt[]) => {
-    const canvas = refCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const w = (canvas.width = canvas.clientWidth || 480);
-    const h = (canvas.height = canvas.clientHeight || 360);
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "rgba(18, 10, 14, 1)";
-    ctx.fillRect(0, 0, w, h);
-
-    // keep the figure proportional inside the frame
-    const s = Math.min(w, h) * 1.05;
-    const ox = w / 2 - s / 2;
-    const oy = h / 2 - s / 2;
-    const X = (p: Pt) => ox + p.x * s;
-    const Y = (p: Pt) => oy + p.y * s;
-
-    ctx.strokeStyle = "rgba(120, 220, 170, 0.95)";
-    ctx.lineWidth = 4;
-    for (const [a, b] of CONNECTIONS) {
-      ctx.beginPath();
-      ctx.moveTo(X(pts[a]!), Y(pts[a]!));
-      ctx.lineTo(X(pts[b]!), Y(pts[b]!));
-      ctx.stroke();
-    }
-    ctx.fillStyle = "rgba(220, 255, 235, 0.95)";
-    for (const p of pts) {
-      ctx.beginPath();
-      ctx.arc(X(p), Y(p), 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }, []);
 
 
   const loop = useCallback(() => {
