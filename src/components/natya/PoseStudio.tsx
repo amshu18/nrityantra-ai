@@ -69,21 +69,18 @@ export function PoseStudio() {
 
     const lm = pose?.landmarks?.[0];
     if (lm) {
-      const hot = highlightRef.current;
+      ctx.strokeStyle = "rgba(245, 190, 90, 0.9)";
       ctx.lineWidth = 3;
       for (const [a, b] of CONNECTIONS) {
-        const off = hot.has(a) && hot.has(b);
-        ctx.strokeStyle = off ? "rgba(248, 90, 90, 0.95)" : "rgba(245, 190, 90, 0.9)";
-        ctx.lineWidth = off ? 5 : 3;
         ctx.beginPath();
         ctx.moveTo(lm[a]!.x * canvas.width, lm[a]!.y * canvas.height);
         ctx.lineTo(lm[b]!.x * canvas.width, lm[b]!.y * canvas.height);
         ctx.stroke();
       }
-      lm.forEach((p: Pt, i: number) => {
-        ctx.fillStyle = hot.has(i) ? "rgba(248, 90, 90, 0.95)" : "rgba(255, 236, 200, 0.95)";
+      ctx.fillStyle = "rgba(255, 236, 200, 0.95)";
+      lm.forEach((p: Pt) => {
         ctx.beginPath();
-        ctx.arc(p.x * canvas.width, p.y * canvas.height, hot.has(i) ? 6 : 4, 0, Math.PI * 2);
+        ctx.arc(p.x * canvas.width, p.y * canvas.height, 4, 0, Math.PI * 2);
         ctx.fill();
       });
     }
