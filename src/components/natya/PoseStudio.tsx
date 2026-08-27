@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ADAVUS, getAdavu } from "@/lib/natya/adavus";
 import { analyzeFrame, FootworkTracker, gradeFor, L, SUGGESTION_BANK } from "@/lib/natya/analysis";
 import { classifyMudra, MUDRA_NOTES } from "@/lib/natya/mudra";
+import { comparePose, referencePose, type Deviation } from "@/lib/natya/reference";
 import { saveSession } from "@/lib/natya/session";
-import type { FrameAnalysis, Metric, MetricKey, Mistake, SessionReport } from "@/lib/natya/types";
+import type { FrameAnalysis, Metric, MetricKey, Mistake, Pt, SessionReport } from "@/lib/natya/types";
+import { ComparisonPanel } from "./ComparisonPanel";
 import { MetricBar, ScoreRing } from "./ScoreRing";
 import { SessionReportView } from "./SessionReportView";
+
 
 const CONNECTIONS: [number, number][] = [
   [11, 12], [11, 23], [12, 24], [23, 24],
