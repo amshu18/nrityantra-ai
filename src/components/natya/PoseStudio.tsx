@@ -36,8 +36,6 @@ export function PoseStudio() {
   const lastIssueRef = useRef<Record<string, number>>({});
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const refCanvasRef = useRef<HTMLCanvasElement>(null);
-  const highlightRef = useRef<Set<number>>(new Set());
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +46,6 @@ export function PoseStudio() {
   const [report, setReport] = useState<SessionReport | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
-  const [deviations, setDeviations] = useState<Deviation[]>([]);
 
 
   useEffect(() => {
