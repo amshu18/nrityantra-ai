@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      practice_sessions: {
+        Row: {
+          accuracy: number
+          adavu: string
+          camera_mode: string
+          created_at: string
+          duration_seconds: number
+          feedback: string[]
+          grade: string
+          id: string
+          metrics: Json
+          mistake_count: number
+          mudras: string[]
+          performed_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number
+          adavu: string
+          camera_mode?: string
+          created_at?: string
+          duration_seconds?: number
+          feedback?: string[]
+          grade?: string
+          id?: string
+          metrics?: Json
+          mistake_count?: number
+          mudras?: string[]
+          performed_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number
+          adavu?: string
+          camera_mode?: string
+          created_at?: string
+          duration_seconds?: number
+          feedback?: string[]
+          grade?: string
+          id?: string
+          metrics?: Json
+          mistake_count?: number
+          mudras?: string[]
+          performed_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          last_practice_date: string | null
+          longest_streak: number
+          practice_streak: number
+          total_minutes: number
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          last_practice_date?: string | null
+          longest_streak?: number
+          practice_streak?: number
+          total_minutes?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          last_practice_date?: string | null
+          longest_streak?: number
+          practice_streak?: number
+          total_minutes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
