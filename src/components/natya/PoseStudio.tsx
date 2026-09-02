@@ -1,15 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, CircleStop, Download, Loader2, Play, Square } from "lucide-react";
+import { Camera, CircleStop, Download, Loader2, Play, Square, UserRound } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ADAVUS, getAdavu } from "@/lib/natya/adavus";
-import { analyzeFrame, FootworkTracker, gradeFor, L, SUGGESTION_BANK } from "@/lib/natya/analysis";
+import {
+  analyzeFrame,
+  detectMode,
+  FootworkTracker,
+  gradeFor,
+  L,
+  SUGGESTION_BANK,
+  upperBodyVisible,
+  type CameraMode,
+} from "@/lib/natya/analysis";
 import { classifyMudra, MUDRA_NOTES } from "@/lib/natya/mudra";
 
+import { saveCloudSession } from "@/lib/natya/cloud";
 import { saveSession } from "@/lib/natya/session";
 import type { FrameAnalysis, Metric, MetricKey, Mistake, Pt, SessionReport } from "@/lib/natya/types";
 
 import { MetricBar, ScoreRing } from "./ScoreRing";
 import { SessionReportView } from "./SessionReportView";
+
 
 
 const CONNECTIONS: [number, number][] = [
