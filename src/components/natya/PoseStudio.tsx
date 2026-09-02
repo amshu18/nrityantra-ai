@@ -124,10 +124,23 @@ export function PoseStudio() {
     draw(pose, hands);
 
     const lm = pose?.landmarks?.[0];
-    if (lm) {
+    if (lm && upperBodyVisible(lm)) {
       const t = now - startRef.current;
       const cfg = adavuRef.current;
-      footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
+
+      // --- adaptive framing: switch to upper-body scoring when legs leave the frame
+      const detected = detectMode(lm);
+      if (detected === modeRef.current) {
+        modeVotesRef.current = 0;
+      } else if (++modeVotesRef.current > 12) {
+        modeVotesRef.current = 0;
+        modeRef.current = detected;
+        setMode(detected);
+        if (detected === "upper") footRef.current.reset();
+      }
+      const mode = modeRef.current;
+
+      if (mode === "full") footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
 
       const handed: string[] = (hands?.handedness ?? []).map((h: any) => h[0]?.categoryName ?? "");
       const mudras = { left: "—", right: "—" };
@@ -136,10 +149,18 @@ export function PoseStudio() {
         if (handed[i] === "Left") mudras.right = name;
         else mudras.left = name;
       });
-      const res = analyzeFrame(lm, cfg, mudras, {
-        tempo: footRef.current.tempo(),
-        steadiness: footRef.current.steadiness(),
-      });
+      for (const m of [mudras.left, mudras.right]) if (m && m !== "—") mudraSeenRef.current.add(m);
+      const res = analyzeFrame(
+        lm,
+        cfg,
+        mudras,
+        {
+          tempo: mode === "full" ? footRef.current.tempo() : null,
+          steadiness: mode === "full" ? footRef.current.steadiness() : null,
+        },
+        mode,
+      );
+
       setAnalysis(res);
       scoresRef.current = scoresRef.current || ({} as any);
       for (const m of res.metrics) {
