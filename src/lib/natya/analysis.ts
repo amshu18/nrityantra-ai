@@ -95,12 +95,40 @@ export class FootworkTracker {
   }
 }
 
+export type CameraMode = "full" | "upper";
+
+const inFrame = (pt: Pt | undefined, minVis = 0.35) =>
+  !!pt &&
+  (pt.visibility ?? 1) >= minVis &&
+  pt.x > -0.05 &&
+  pt.x < 1.05 &&
+  pt.y > -0.05 &&
+  pt.y < 1.02;
+
+/**
+ * Decide whether the camera sees the whole body or only the upper body.
+ * Close-up (3–5 ft) framings drop ankles/knees out of view — we switch to
+ * upper-body scoring instead of reporting broken lower-body metrics.
+ */
+export function detectMode(p: Pt[]): CameraMode {
+  const feet = [L.lAnkle, L.rAnkle].filter((i) => inFrame(p[i])).length;
+  const knees = [L.lKnee, L.rKnee].filter((i) => inFrame(p[i])).length;
+  return feet >= 1 && knees >= 1 ? "full" : "upper";
+}
+
+/** Landmarks that must be visible for any scoring to be meaningful. */
+export function upperBodyVisible(p: Pt[]) {
+  return [L.lShoulder, L.rShoulder].every((i) => inFrame(p[i], 0.2));
+}
+
 export function analyzeFrame(
   p: Pt[],
   adavu: Adavu,
   mudras: { left: string; right: string },
   foot: { tempo: number | null; steadiness: number | null },
+  mode: CameraMode = "full",
 ): FrameAnalysis {
+
   const shoulderW = Math.hypot(p[L.lShoulder]!.x - p[L.rShoulder]!.x, p[L.lShoulder]!.y - p[L.rShoulder]!.y) || 0.2;
   const shoulders = mid(p[L.lShoulder]!, p[L.rShoulder]!);
   const hips = mid(p[L.lHip]!, p[L.rHip]!);
