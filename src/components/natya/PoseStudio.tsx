@@ -48,16 +48,21 @@ export function PoseStudio() {
   const lastIssueRef = useRef<Record<string, number>>({});
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const modeRef = useRef<CameraMode>("full");
+  const modeVotesRef = useRef(0);
+  const mudraSeenRef = useRef<Set<string>>(new Set());
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [adavuId, setAdavuId] = useState(ADAVUS[0]!.id);
   const adavuRef = useRef(getAdavu(adavuId));
   const [analysis, setAnalysis] = useState<FrameAnalysis | null>(null);
+  const [mode, setMode] = useState<CameraMode>("full");
   const [feed, setFeed] = useState<Mistake[]>([]);
   const [report, setReport] = useState<SessionReport | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+
 
 
   useEffect(() => {
