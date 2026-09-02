@@ -154,7 +154,11 @@ export function analyzeFrame(
     Math.abs(
       (shoulders.y - p[L.lWrist]!.y) / shoulderW - (shoulders.y - p[L.rWrist]!.y) / shoulderW,
     ) * 100;
-  const symmetry = Math.round(0.5 * tolerance(kneeDiff, 0, 6, 45) + 0.5 * tolerance(wristDiff, 0, 8, 70));
+  const symmetry =
+    mode === "upper"
+      ? tolerance(wristDiff, 0, 8, 70)
+      : Math.round(0.5 * tolerance(kneeDiff, 0, 6, 45) + 0.5 * tolerance(wristDiff, 0, 8, 70));
+
 
   // --- Hasta placement: arm elevation vs shoulder line
   const armEl = (side: "l" | "r") => {
