@@ -95,12 +95,40 @@ export class FootworkTracker {
   }
 }
 
+export type CameraMode = "full" | "upper";
+
+const inFrame = (pt: Pt | undefined, minVis = 0.35) =>
+  !!pt &&
+  (pt.visibility ?? 1) >= minVis &&
+  pt.x > -0.05 &&
+  pt.x < 1.05 &&
+  pt.y > -0.05 &&
+  pt.y < 1.02;
+
+/**
+ * Decide whether the camera sees the whole body or only the upper body.
+ * Close-up (3–5 ft) framings drop ankles/knees out of view — we switch to
+ * upper-body scoring instead of reporting broken lower-body metrics.
+ */
+export function detectMode(p: Pt[]): CameraMode {
+  const feet = [L.lAnkle, L.rAnkle].filter((i) => inFrame(p[i])).length;
+  const knees = [L.lKnee, L.rKnee].filter((i) => inFrame(p[i])).length;
+  return feet >= 1 && knees >= 1 ? "full" : "upper";
+}
+
+/** Landmarks that must be visible for any scoring to be meaningful. */
+export function upperBodyVisible(p: Pt[]) {
+  return [L.lShoulder, L.rShoulder].every((i) => inFrame(p[i], 0.2));
+}
+
 export function analyzeFrame(
   p: Pt[],
   adavu: Adavu,
   mudras: { left: string; right: string },
   foot: { tempo: number | null; steadiness: number | null },
+  mode: CameraMode = "full",
 ): FrameAnalysis {
+
   const shoulderW = Math.hypot(p[L.lShoulder]!.x - p[L.rShoulder]!.x, p[L.lShoulder]!.y - p[L.rShoulder]!.y) || 0.2;
   const shoulders = mid(p[L.lShoulder]!, p[L.rShoulder]!);
   const hips = mid(p[L.lHip]!, p[L.rHip]!);
@@ -126,7 +154,11 @@ export function analyzeFrame(
     Math.abs(
       (shoulders.y - p[L.lWrist]!.y) / shoulderW - (shoulders.y - p[L.rWrist]!.y) / shoulderW,
     ) * 100;
-  const symmetry = Math.round(0.5 * tolerance(kneeDiff, 0, 6, 45) + 0.5 * tolerance(wristDiff, 0, 8, 70));
+  const symmetry =
+    mode === "upper"
+      ? tolerance(wristDiff, 0, 8, 70)
+      : Math.round(0.5 * tolerance(kneeDiff, 0, 6, 45) + 0.5 * tolerance(wristDiff, 0, 8, 70));
+
 
   // --- Hasta placement: arm elevation vs shoulder line
   const armEl = (side: "l" | "r") => {
@@ -155,15 +187,25 @@ export function analyzeFrame(
   const sync =
     foot.tempo === null ? 70 : tolerance(foot.tempo, adavu.tempo, adavu.tempo * 0.06, adavu.tempo * 0.6);
 
-  const metrics: Metric[] = [
+  const lowerVisible = mode === "full";
+
+  const allMetrics: Metric[] = [
     { key: "araimandi", label: "Araimandi", score: araimandi, detail: `Knee angle ${Math.round(knee)}° (target ${adavu.kneeAngle}°)` },
     { key: "posture", label: "Body posture", score: posture, detail: `Torso tilt ${Math.abs(torsoTilt).toFixed(0)}°, shoulders ${Math.abs(shoulderTilt).toFixed(0)}°` },
-    { key: "symmetry", label: "Symmetry", score: symmetry, detail: `Knee diff ${kneeDiff.toFixed(0)}°` },
+    {
+      key: "symmetry",
+      label: "Symmetry",
+      score: symmetry,
+      detail: lowerVisible ? `Knee diff ${kneeDiff.toFixed(0)}°` : `Arm height diff ${wristDiff.toFixed(0)}%`,
+    },
     { key: "hasta", label: "Mudra & hastas", score: hasta, detail: `${mudras.right} / ${mudras.left} · arms ${elevation.toFixed(0)}°` },
     { key: "padabheda", label: "Padabheda", score: padabheda, detail: `Stance ${stance.toFixed(2)}× shoulders · ${adavu.padabheda}` },
     { key: "footwork", label: "Footwork", score: footwork, detail: foot.steadiness === null ? "Listening for thattu…" : `Rhythm steadiness ${foot.steadiness}%` },
     { key: "sync", label: "Tala sync", score: sync, detail: foot.tempo === null ? "Awaiting beats…" : `${foot.tempo} bpm vs ${adavu.tempo} bpm` },
   ];
+
+  const lowerKeys: MetricKey[] = ["araimandi", "padabheda", "footwork", "sync"];
+  const metrics = lowerVisible ? allMetrics : allMetrics.filter((m) => !lowerKeys.includes(m.key));
 
   const weights: Record<MetricKey, number> = {
     araimandi: 1.3,
@@ -182,18 +224,22 @@ export function analyzeFrame(
     if (score < 55) issues.push({ metric: key, message, severity: "major" });
     else if (score < 75) issues.push({ metric: key, message, severity: "minor" });
   };
-  flag(
-    "araimandi",
-    araimandi,
-    knee > adavu.kneeAngle ? "Sit deeper into araimandi — knees are too straight." : "Araimandi is too low; lift slightly and keep the spine tall.",
-  );
+  if (lowerVisible)
+    flag(
+      "araimandi",
+      araimandi,
+      knee > adavu.kneeAngle ? "Sit deeper into araimandi — knees are too straight." : "Araimandi is too low; lift slightly and keep the spine tall.",
+    );
   flag("posture", posture, Math.abs(torsoTilt) > Math.abs(shoulderTilt) ? "Torso is leaning — stack shoulders over hips." : "Shoulders are uneven — level them.");
-  flag("symmetry", symmetry, "Left and right sides differ — mirror both limbs equally.");
+  flag("symmetry", symmetry, lowerVisible ? "Left and right sides differ — mirror both limbs equally." : "Arms are uneven — match both hasta heights.");
   flag("hasta", hasta, elevation < adavu.armElevation ? "Lift the arms to the correct hasta level." : "Lower the arms to the prescribed hasta level.");
-  flag("padabheda", padabheda, stance < adavu.stance ? "Widen the stance for this padabheda." : "Stance is too wide — bring the feet in.");
-  if (foot.steadiness !== null) flag("footwork", footwork, "Footwork is uneven — strike the floor with even weight.");
-  if (foot.tempo !== null)
-    flag("sync", sync, (foot.tempo ?? 0) > adavu.tempo ? "You are rushing ahead of the tala." : "You are lagging behind the tala.");
+  if (lowerVisible) {
+    flag("padabheda", padabheda, stance < adavu.stance ? "Widen the stance for this padabheda." : "Stance is too wide — bring the feet in.");
+    if (foot.steadiness !== null) flag("footwork", footwork, "Footwork is uneven — strike the floor with even weight.");
+    if (foot.tempo !== null)
+      flag("sync", sync, (foot.tempo ?? 0) > adavu.tempo ? "You are rushing ahead of the tala." : "You are lagging behind the tala.");
+  }
+
 
   return { metrics, overall, mudra: mudras, issues };
 }

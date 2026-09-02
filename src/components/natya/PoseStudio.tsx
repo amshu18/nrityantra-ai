@@ -1,15 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Camera, CircleStop, Download, Loader2, Play, Square } from "lucide-react";
+import { Camera, CircleStop, Download, Loader2, Play, Square, UserRound } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ADAVUS, getAdavu } from "@/lib/natya/adavus";
-import { analyzeFrame, FootworkTracker, gradeFor, L, SUGGESTION_BANK } from "@/lib/natya/analysis";
+import {
+  analyzeFrame,
+  detectMode,
+  FootworkTracker,
+  gradeFor,
+  L,
+  SUGGESTION_BANK,
+  upperBodyVisible,
+  type CameraMode,
+} from "@/lib/natya/analysis";
 import { classifyMudra, MUDRA_NOTES } from "@/lib/natya/mudra";
 
+import { saveCloudSession } from "@/lib/natya/cloud";
 import { saveSession } from "@/lib/natya/session";
 import type { FrameAnalysis, Metric, MetricKey, Mistake, Pt, SessionReport } from "@/lib/natya/types";
 
 import { MetricBar, ScoreRing } from "./ScoreRing";
 import { SessionReportView } from "./SessionReportView";
+
 
 
 const CONNECTIONS: [number, number][] = [
@@ -36,16 +48,21 @@ export function PoseStudio() {
   const lastIssueRef = useRef<Record<string, number>>({});
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const modeRef = useRef<CameraMode>("full");
+  const modeVotesRef = useRef(0);
+  const mudraSeenRef = useRef<Set<string>>(new Set());
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [adavuId, setAdavuId] = useState(ADAVUS[0]!.id);
   const adavuRef = useRef(getAdavu(adavuId));
   const [analysis, setAnalysis] = useState<FrameAnalysis | null>(null);
+  const [mode, setMode] = useState<CameraMode>("full");
   const [feed, setFeed] = useState<Mistake[]>([]);
   const [report, setReport] = useState<SessionReport | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+
 
 
   useEffect(() => {
@@ -112,10 +129,23 @@ export function PoseStudio() {
     draw(pose, hands);
 
     const lm = pose?.landmarks?.[0];
-    if (lm) {
+    if (lm && upperBodyVisible(lm)) {
       const t = now - startRef.current;
       const cfg = adavuRef.current;
-      footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
+
+      // --- adaptive framing: switch to upper-body scoring when legs leave the frame
+      const detected = detectMode(lm);
+      if (detected === modeRef.current) {
+        modeVotesRef.current = 0;
+      } else if (++modeVotesRef.current > 12) {
+        modeVotesRef.current = 0;
+        modeRef.current = detected;
+        setMode(detected);
+        if (detected === "upper") footRef.current.reset();
+      }
+      const mode = modeRef.current;
+
+      if (mode === "full") footRef.current.push(Math.min(lm[L.lAnkle]!.y, lm[L.rAnkle]!.y), now, cfg.tempo);
 
       const handed: string[] = (hands?.handedness ?? []).map((h: any) => h[0]?.categoryName ?? "");
       const mudras = { left: "—", right: "—" };
@@ -124,10 +154,18 @@ export function PoseStudio() {
         if (handed[i] === "Left") mudras.right = name;
         else mudras.left = name;
       });
-      const res = analyzeFrame(lm, cfg, mudras, {
-        tempo: footRef.current.tempo(),
-        steadiness: footRef.current.steadiness(),
-      });
+      for (const m of [mudras.left, mudras.right]) if (m && m !== "—") mudraSeenRef.current.add(m);
+      const res = analyzeFrame(
+        lm,
+        cfg,
+        mudras,
+        {
+          tempo: mode === "full" ? footRef.current.tempo() : null,
+          steadiness: mode === "full" ? footRef.current.steadiness() : null,
+        },
+        mode,
+      );
+
       setAnalysis(res);
       scoresRef.current = scoresRef.current || ({} as any);
       for (const m of res.metrics) {
