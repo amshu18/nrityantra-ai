@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SessionReportView } from "@/components/natya/SessionReportView";
@@ -7,6 +8,11 @@ import { loadSessions } from "@/lib/natya/session";
 import type { SessionReport } from "@/lib/natya/types";
 
 export const Route = createFileRoute("/reports")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/auth" });
+  },
   head: () => ({
     meta: [
       { title: "Practice Reports — Nrityaantra" },
