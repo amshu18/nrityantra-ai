@@ -82,9 +82,6 @@ function AuthPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-16">
-      <Link to="/" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="size-4" /> Back to studio
-      </Link>
       <div className="panel p-6">
         <p className="text-xs uppercase tracking-[0.32em] text-primary">Nrityaantra</p>
         <h1 className="mt-2 font-display text-3xl">{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
