@@ -56,9 +56,16 @@ function Home() {
                 <a href="#studio">Start live analysis</a>
               </Button>
               <Button asChild size="lg" variant="outline">
+                <Link to="/dashboard">My dashboard</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/auth">Sign in</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
                 <Link to="/reports">View past reports</Link>
               </Button>
             </div>
+
           </div>
           <div className="panel glow overflow-hidden">
             <img

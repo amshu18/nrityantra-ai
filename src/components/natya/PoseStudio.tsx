@@ -211,6 +211,10 @@ export function PoseStudio() {
         },
         runningMode: "VIDEO",
         numPoses: 1,
+        // lowered so close-up / partially cropped framing still tracks smoothly
+        minPoseDetectionConfidence: 0.3,
+        minPosePresenceConfidence: 0.3,
+        minTrackingConfidence: 0.3,
       });
       handRef.current = await vision.HandLandmarker.createFromOptions(files, {
         baseOptions: {
@@ -220,7 +224,11 @@ export function PoseStudio() {
         },
         runningMode: "VIDEO",
         numHands: 2,
+        minHandDetectionConfidence: 0.3,
+        minHandPresenceConfidence: 0.3,
+        minTrackingConfidence: 0.3,
       });
+
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 1280, height: 720, facingMode: "user" },
@@ -309,6 +317,15 @@ export function PoseStudio() {
       };
       saveSession(rep);
       setReport(rep);
+      saveCloudSession(rep, {
+        cameraMode: modeRef.current,
+        mudras: [...mudraSeenRef.current],
+      })
+        .then((saved) => {
+          if (saved) toast.success("Session saved to your dashboard.");
+        })
+        .catch(() => toast.error("Could not save this session to your dashboard."));
+
     }
     setStatus("ready");
   }, []);
@@ -327,9 +344,10 @@ export function PoseStudio() {
         <p className="text-xs uppercase tracking-[0.32em] text-primary">Live studio</p>
         <h2 className="mt-2 text-3xl font-semibold sm:text-4xl">Full-body analysis in real time</h2>
         <p className="mt-3 text-sm text-muted-foreground">
-          MediaPipe tracks 33 body landmarks and 21 points per hand. Stand 2–3 metres from the camera so your feet
-          stay in frame, choose an adavu, and begin.
+          MediaPipe tracks 33 body landmarks and 21 points per hand. Stand wherever you have space — if your feet
+          leave the frame the studio switches to upper-body and hand scoring automatically.
         </p>
+
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
@@ -360,6 +378,13 @@ export function PoseStudio() {
                 REC {(elapsed / 1000).toFixed(1)}s
               </div>
             )}
+            {running && (
+              <div className="absolute right-4 top-4 flex items-center gap-2 rounded-full bg-background/80 px-3 py-1.5 text-xs">
+                <UserRound className="size-3.5 text-primary" />
+                {mode === "upper" ? "Upper-body mode" : "Full-body mode"}
+              </div>
+            )}
+
           </div>
 
 
