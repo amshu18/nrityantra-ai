@@ -1,11 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Activity, Footprints, Hand, LineChart, Repeat2, ShieldCheck } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import heroImg from "@/assets/hero-dancer.jpg";
 import { Button } from "@/components/ui/button";
 import { PoseStudio } from "@/components/natya/PoseStudio";
 import { ADAVUS } from "@/lib/natya/adavus";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/auth" });
+  },
   head: () => ({
     meta: [
       { title: "Nrityaantra — AI for Bharatanatyam" },
