@@ -1,4 +1,4 @@
-# Bharatanatyam AI Coach (98)
+# Bharatanatyam 
 
 Expand detection to full-body pose tracking using MediaPipe.
 
