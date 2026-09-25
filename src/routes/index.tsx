@@ -9,6 +9,7 @@ import { ADAVUS } from "@/lib/natya/adavus";
 export const Route = createFileRoute("/")({
   ssr: false,
   beforeLoad: async () => {
+    if (isGuest()) return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/auth" });
   },

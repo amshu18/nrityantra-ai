@@ -80,6 +80,11 @@ function AuthPage() {
     navigate({ to: "/" });
   };
 
+  const guest = () => {
+    enableGuest();
+    navigate({ to: "/" });
+  };
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-16">
       <div className="panel p-6">

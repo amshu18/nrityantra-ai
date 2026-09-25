@@ -10,6 +10,7 @@ import type { SessionReport } from "@/lib/natya/types";
 export const Route = createFileRoute("/reports")({
   ssr: false,
   beforeLoad: async () => {
+    if (isGuest()) return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/auth" });
   },
