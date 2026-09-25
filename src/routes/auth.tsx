@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { enableGuest } from "@/lib/natya/guest";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -80,6 +81,11 @@ function AuthPage() {
     navigate({ to: "/" });
   };
 
+  const guest = () => {
+    enableGuest();
+    navigate({ to: "/" });
+  };
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-16">
       <div className="panel p-6">
@@ -92,6 +98,13 @@ function AuthPage() {
         <Button onClick={google} disabled={busy} variant="outline" className="mt-6 w-full">
           Continue with Google
         </Button>
+
+        <Button onClick={guest} disabled={busy} variant="ghost" className="mt-2 w-full">
+          Continue as guest
+        </Button>
+        <p className="mt-1 text-center text-xs text-muted-foreground">
+          Guest sessions are saved only on this device — sign in to sync and keep your streak.
+        </p>
 
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
           <span className="h-px flex-1 bg-border" /> or use email <span className="h-px flex-1 bg-border" />
