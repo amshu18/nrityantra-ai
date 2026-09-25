@@ -5,6 +5,7 @@ import heroImg from "@/assets/hero-dancer.jpg";
 import { Button } from "@/components/ui/button";
 import { PoseStudio } from "@/components/natya/PoseStudio";
 import { ADAVUS } from "@/lib/natya/adavus";
+import { isGuest } from "@/lib/natya/guest";
 
 export const Route = createFileRoute("/")({
   ssr: false,

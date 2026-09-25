@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SessionReportView } from "@/components/natya/SessionReportView";
 import { loadSessions } from "@/lib/natya/session";
+import { isGuest } from "@/lib/natya/guest";
 import type { SessionReport } from "@/lib/natya/types";
 
 export const Route = createFileRoute("/reports")({
