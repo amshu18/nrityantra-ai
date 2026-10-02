@@ -1,42 +1,86 @@
-# Bharatanatyam 
+# Nrityantra AI – Bharatanatyam Performance Analysis
 
-Expand detection to full-body pose tracking using MediaPipe.
+**Nrityantra AI** is an AI-powered Bharatanatyam performance analysis platform designed to assist dancers and instructors through intelligent movement tracking, performance evaluation, and personalized feedback.
 
- Develop AI-based Bharatanatyam performance analysis.
+The project aims to extend traditional hand gesture recognition into full-body pose tracking to analyze Bharatanatyam techniques and help dancers improve their performance.
 
- Evaluate mudras, adavus, padabhedas & body posture.
+## Project Objectives
 
- Analyze footwork, synchronization & movement accuracy.
+* Expand detection to full-body pose tracking using MediaPipe.
+* Develop AI-based Bharatanatyam performance analysis.
+* Evaluate mudras, adavus, padabhedas, and body posture.
+* Analyze footwork, synchronization, and movement accuracy.
+* Provide real-time feedback and improvement suggestions.
+* Generate objective performance scores using predefined evaluation parameters.
+* Record performances and highlight mistakes.
+* Generate detailed reports showing score deductions and detected errors.
+* Support online Bharatanatyam training through AI-assisted analysis.
 
- Provide real-time feedback & improvement suggestions.
+## Key Features
 
- Generate unbiased scores using predefined parameters.
+* **Full-Body Pose Tracking:** Track body movements and posture using MediaPipe.
+* **Mudra Recognition:** Identify Bharatanatyam hand gestures.
+* **Performance Evaluation:** Assess dance movements based on predefined parameters.
+* **Real-Time Feedback:** Help dancers identify mistakes and improve their techniques.
+* **Performance Reports:** Generate scores, error summaries, and improvement suggestions.
+* **AI-Assisted Training:** Support dancers in practicing and evaluating their performances.
 
- Record performances & highlight mistakes.
+## Live Application
 
- Generate reports on score deductions & errors.
+[Visit Nrityantra AI](https://nrityantra-ai.lovable.app)
 
- Assist online Bharatanatyam training through AI analysis.
+## Technology Stack
 
-This project was built with [Lovable](https://lovable.dev).
+* **Programming Language:** Python, JavaScript / TypeScript
+* **AI & Computer Vision:** MediaPipe, OpenCV
+* **Machine Learning:** Random Forest Classification
+* **Frontend:** React
+* **Development Tools:** VS Code, Git, GitHub
 
-**Live app**: https://nrityantra-ai.lovable.app
+## Getting Started
 
-## Build with Lovable
+### Prerequisites
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/7d596289-da66-42ab-a770-97aef970d6ab).
+Make sure you have the following installed:
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+* Node.js
+* npm
+* Git
 
-## Development
+### Installation
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Clone the repository:
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
+git clone https://github.com/amshu18/nrityantra-ai.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd nrityantra-ai
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
+
+Open the local URL displayed in your terminal to access the application.
+
+## Project Vision
+
+Nrityantra AI aims to bridge the gap between traditional Bharatanatyam learning and modern artificial intelligence by providing accessible, technology-assisted performance analysis.
+
+The platform is intended to support dancers, students, and instructors in understanding movement accuracy, identifying areas for improvement, and preserving the technical aspects of Bharatanatyam through AI-driven analysis.
+
+---
+
+**Developed with a vision to bring Artificial Intelligence and Indian classical dance together.**
