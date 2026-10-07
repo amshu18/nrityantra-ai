@@ -25,9 +25,6 @@ The project aims to extend traditional hand gesture recognition into full-body p
 * **Performance Reports:** Generate scores, error summaries, and improvement suggestions.
 * **AI-Assisted Training:** Support dancers in practicing and evaluating their performances.
 
-## Live Application
-
-[Visit Nrityantra AI](https://nrityantra-ai.lovable.app)
 
 ## Technology Stack
 
